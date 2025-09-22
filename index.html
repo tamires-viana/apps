@@ -63,9 +63,10 @@
     </div>
 
     <script>
-        // URL da sua planilha do Google Sheets publicada em formato CSV
+        // Agora, o aplicativo usa o link público da sua planilha no Google Drive.
+        // A mudança no nome do arquivo no Drive não afeta este link, pois ele é gerado
+        // automaticamente pelo Google Sheets.
         const csvFileUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTA6rLAP6GbKi2fQI20XI1HYcSoNWalUHI-blYsORqXIG8hH5owmULSqeDT5iaJAhKjuwIl0i2Np0k/pub?output=csv';
-
         let allQuestions = [];
         let filteredQuestions = [];
         let activeFilters = { origem: new Set(), temas: new Set() };
@@ -171,33 +172,42 @@
         // Função para parsear o CSV e extrair as perguntas e metadados
         function parseCSV(csv) {
             const data = [];
+            let inQuote = false;
+            let field = '';
             const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
-
-            // Regex para capturar campos, incluindo aqueles entre aspas
-            const regex = /"([^"]*)"|([^,]*)/g;
 
             lines.forEach((line, index) => {
                 if (index === 0) return; // Pular o cabeçalho
-                
-                let match;
+
                 const row = [];
-                while ((match = regex.exec(line)) !== null) {
-                    // O primeiro grupo de captura (match[1]) é para o texto entre aspas.
-                    // O segundo grupo (match[2]) é para o texto sem aspas.
-                    const value = match[1] || match[2];
-                    if (value !== undefined && value.trim() !== '') {
-                        row.push(value.trim());
+                let inQuote = false;
+                let field = '';
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        // Tratar aspas duplas, tanto no início/fim quanto dentro do campo
+                        if (inQuote && line[i + 1] === '"') {
+                            field += '"';
+                            i++;
+                        } else {
+                            inQuote = !inQuote;
+                        }
+                    } else if (char === ',' && !inQuote) {
+                        row.push(field);
+                        field = '';
+                    } else {
+                        field += char;
                     }
                 }
-
+                row.push(field);
+                
                 if (row.length >= 3) {
                     data.push({
-                        origem: row[0],
-                        pergunta: row[1],
-                        temas: row[2]
+                        origem: row[0].trim(),
+                        pergunta: row[1].trim(),
+                        temas: row[2].trim()
                     });
-                } else {
-                    console.warn(`Linha inválida (pular): ${line}`);
                 }
             });
             return data;
@@ -215,7 +225,7 @@
 
         function createFilterButtons(containerId, data, key) {
             const container = document.getElementById(containerId);
-            container.innerHTML = ''; // Limpa botões antigos
+            container.innerHTML = '';
             let values = getUniqueValues(data, key);
 
             values.forEach(filterValue => {
@@ -246,7 +256,6 @@
                 });
                 container.appendChild(button);
             });
-            // Ativa o botão 'Todos' por padrão
             container.querySelector('button').classList.add('border-2', 'border-blue-600', 'bg-blue-600', 'text-white');
         }
 
@@ -303,17 +312,14 @@
             if (filteredQuestions.length > 0) {
                 const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
                 const questionData = filteredQuestions[randomIndex];
-                // Find a matching emoji based on the themes
                 const themesArray = questionData.temas.split(',').map(t => t.trim());
                 let emoji = themesArray.map(t => emojiMap[t]).find(e => e) || '';
                 const randomQuestion = `${emoji} ${questionData.pergunta}`;
                 
-                // Adiciona classes para animação de saída
                 questionCard.classList.add('opacity-0', 'scale-95');
                 
                 setTimeout(() => {
                     questionTextElement.textContent = randomQuestion;
-                    // Remove as classes para animação de entrada
                     questionCard.classList.remove('opacity-0', 'scale-95');
                 }, 300);
                 
@@ -343,7 +349,6 @@
                     }).catch(error => console.log('Erro ao compartilhar', error));
                 } else if (navigator.clipboard) {
                     navigator.clipboard.writeText(textToShare).then(() => {
-                        // Use a custom message box instead of alert
                         const msgBox = document.createElement('div');
                         msgBox.textContent = 'Pergunta copiada para a área de transferência! Cole onde desejar, como nos Stories do Instagram.';
                         msgBox.style.cssText = `
@@ -364,7 +369,6 @@
                         console.error('Erro ao copiar texto: ', err);
                     });
                 } else {
-                    // Use a custom message box instead of alert
                     const msgBox = document.createElement('div');
                     msgBox.textContent = 'Seu navegador não suporta o compartilhamento automático. Por favor, copie e cole a pergunta manualmente.';
                     msgBox.style.cssText = `
@@ -385,7 +389,6 @@
             }
         });
 
-        // Inicia o carregamento dos dados e a inicialização da aplicação
         loadAndInitialize();
     </script>
 </body>

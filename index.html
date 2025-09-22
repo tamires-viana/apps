@@ -11,42 +11,54 @@
             font-family: 'Inter', sans-serif;
             transition: background-image 1s ease-in-out;
         }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .main-content > div {
+                width: 100%;
+                margin-bottom: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen text-gray-800 p-4">
-    <div id="app-container" class="bg-white rounded-3xl shadow-xl p-8 max-w-4xl w-full flex flex-col items-center text-center text-white transition-all duration-700 ease-in-out">
-        <!-- Título do aplicativo -->
-        <h1 class="text-4xl font-bold mb-6 text-gray-800">Puxa Conversa</h1>
+    <div class="flex flex-col lg:flex-row w-full max-w-7xl gap-6">
+        <!-- Main Application Panel -->
+        <div id="app-container" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-2/3 flex flex-col items-center text-center text-white transition-all duration-700 ease-in-out">
+            <!-- Título do aplicativo -->
+            <h1 class="text-4xl font-bold mb-6 text-gray-800">Puxa Conversa</h1>
 
-        <!-- Filtros -->
-        <div class="w-full mb-6">
-            <h2 class="text-xl font-semibold mb-2 text-gray-800">Origem</h2>
-            <div id="origem-filter-container" class="flex flex-wrap justify-center gap-2 mb-4"></div>
-            <h2 class="text-xl font-semibold mb-2 text-gray-800">Tema</h2>
-            <div id="tema-filter-container" class="flex flex-wrap justify-center gap-2 mb-4"></div>
-        </div>
+            <!-- Filtros -->
+            <div class="w-full mb-6">
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Origem</h2>
+                <div id="origem-filter-container" class="flex flex-wrap justify-center gap-2 mb-4"></div>
+                <h2 class="text-xl font-semibold mb-2 text-gray-800">Tema</h2>
+                <div id="tema-filter-container" class="flex flex-wrap justify-center gap-2 mb-4"></div>
+            </div>
 
-        <!-- Contagem de Perguntas -->
-        <p id="question-count" class="text-lg font-medium text-gray-600 mb-4">0 perguntas disponíveis.</p>
+            <!-- Contagem de Perguntas -->
+            <p id="question-count" class="text-lg font-medium text-gray-600 mb-4">0 perguntas disponíveis.</p>
 
-        <!-- Card da Pergunta -->
-        <div id="question-card" class="bg-white/90 backdrop-blur-sm rounded-2xl p-8 mb-8 w-full min-h-[200px] flex flex-col items-center justify-center shadow-lg transition-all duration-300 transform scale-100 text-gray-800 border border-gray-200">
-            <p id="question-text" class="text-2xl font-medium leading-relaxed italic">
-                Clique no botão para receber a primeira pergunta e começar a conversa!
-            </p>
-        </div>
+            <!-- Card da Pergunta -->
+            <div id="question-card" class="bg-white/90 backdrop-blur-sm rounded-2xl p-8 mb-8 w-full min-h-[200px] flex flex-col items-center justify-center shadow-lg transition-all duration-300 transform scale-100 text-gray-800 border border-gray-200">
+                <p id="question-text" class="text-2xl font-medium leading-relaxed italic">
+                    Clique no botão para receber a primeira pergunta e começar a conversa!
+                </p>
+            </div>
 
-        <!-- Botão para gerar a próxima pergunta -->
-        <button id="next-question-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 mb-4">
-            Próxima Pergunta
-        </button>
+            <!-- Botão para gerar a próxima pergunta -->
+            <button id="next-question-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 mb-4">
+                Surpreenda-me!
+            </button>
 
-        <!-- Botões de Compartilhamento -->
-        <div class="flex gap-4">
-            <button id="whatsapp-share-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                <span class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946l.003-.018c.001-4.832 3.844-8.761 8.675-8.761h.004c2.815 0 5.405 1.109 7.35 3.064 1.945 1.954 3.044 4.544 3.041 7.356v.003c-.001 4.832-3.931 8.76-8.763 8.761-1.928.001-3.827-.686-5.385-2.062l-6.223 1.623zm1.614-5.266l-.001.005-.187-.052-1.282.336 1.349-4.912c.983.565 2.102.88 3.253.882h.001l.004-.002c4.114 0 7.464-3.356 7.462-7.47v-.002c-.001-2.049-.806-3.968-2.259-5.424-1.45-1.455-3.37-2.261-5.424-2.262h-.001c-4.116 0-7.466 3.356-7.466 7.47.001 2.052.808 3.968 2.26 5.424l.001-.001.002.001z"/>
+            <!-- Botões de Compartilhamento -->
+            <div class="flex gap-4">
+                <button id="whatsapp-share-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946l.003-.018c.001-4.832 3.844-8.761 8.675-8.761h.004c2.815 0 5.405 1.109 7.35 3.064 1.945 1.954 3.044 4.544 3.041 7.356v.003c-.001 4.832-3.931 8.76-8.763 8.761-1.928.001-3.827-.686-5.385-2.062l-6.223 1.623zm1.614-5.266l-.001.005-.187-.052-1.282.336 1.349-4.912c.983.565 2.102.88 3.253.882h.001l.004-.002c4.114 0 7.464-3.356 7.462-7.47v-.002c-.001-2.049-.806-3.968-2.259-5.424-1.45-1.455-3.37-2.261-5.424-2.262h-.001c-4.116 0-7.466 3.356-7.466 7.47.001 2.052.808 3.968 2.26 5.424l.001-.001.002.001z"/>
                     </svg>
                     WhatsApp
                 </span>
@@ -61,6 +73,15 @@
             </button>
         </div>
     </div>
+    
+        <!-- Painel do Histórico -->
+        <div id="history-panel" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-1/3 text-gray-800 hidden lg:block overflow-y-auto max-h-screen">
+            <h2 class="text-xl font-bold mb-4">Histórico de Perguntas</h2>
+            <ul id="history-list" class="list-none p-0 space-y-4">
+                <!-- Perguntas do histórico serão inseridas aqui -->
+            </ul>
+        </div>
+    </div>
 
     <script>
         // Agora, o aplicativo usa o link público da sua planilha no Google Drive.
@@ -70,7 +91,9 @@
         let allQuestions = [];
         let filteredQuestions = [];
         let activeFilters = { origem: new Set(), temas: new Set() };
-        
+        let questionHistory = [];
+        const MAX_HISTORY_ITEMS = 5;
+
         const colorGradients = [
             'linear-gradient(to right bottom, #3b82f6, #60a5fa, #93c5fd, #bfdbfe)',
             'linear-gradient(to right bottom, #10b981, #34d399, #6ee7b7, #a7f3d0)',
@@ -168,6 +191,7 @@
         const questionCountElement = document.getElementById('question-count');
         const whatsappShareBtn = document.getElementById('whatsapp-share-btn');
         const shareBtn = document.getElementById('share-btn');
+        const historyList = document.getElementById('history-list');
 
         // Função para parsear o CSV e extrair as perguntas e metadados
         function parseCSV(csv) {
@@ -270,10 +294,29 @@
 
         function updateQuestionCount() {
             const count = filteredQuestions.length;
-            questionCountElement.textContent = `${count} pergunta${count !== 1 ? 's' : ''} disponível${count !== 1 ? 'is' : ''}.`;
+            const text = count === 1 ? 'pergunta disponível.' : 'perguntas disponíveis.';
+            questionCountElement.textContent = `${count} ${text}`;
             if (count === 0) {
                 questionTextElement.textContent = "Nenhuma pergunta encontrada para os filtros selecionados.";
             }
+        }
+        
+        function updateHistory(question) {
+            if (questionHistory.length >= MAX_HISTORY_ITEMS) {
+                questionHistory.shift(); 
+            }
+            questionHistory.push(question);
+            renderHistory();
+        }
+        
+        function renderHistory() {
+            historyList.innerHTML = '';
+            questionHistory.forEach(q => {
+                const li = document.createElement('li');
+                li.className = 'border-l-4 border-blue-600 pl-4 py-2 text-sm text-gray-700';
+                li.textContent = q;
+                historyList.appendChild(li);
+            });
         }
 
         function changeBackgroundColor() {
@@ -324,6 +367,7 @@
                 }, 300);
                 
                 changeBackgroundColor();
+                updateHistory(randomQuestion);
 
             } else {
                 questionTextElement.textContent = "Nenhuma pergunta encontrada para os filtros selecionados.";
@@ -333,22 +377,24 @@
         // Adicionar eventos de clique aos botões de compartilhamento
         whatsappShareBtn.addEventListener('click', () => {
             const text = questionTextElement.textContent;
+            const shareText = `Olha que legal essa pergunta: ${text}`;
             if (text && text !== "Clique no botão para receber a primeira pergunta e começar a conversa!" && text !== "Nenhuma pergunta encontrada para os filtros selecionados.") {
-                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
                 window.open(whatsappUrl, '_blank');
             }
         });
 
         shareBtn.addEventListener('click', () => {
             const textToShare = questionTextElement.textContent;
+            const shareText = `Olha que legal essa pergunta: ${textToShare}`;
             if (textToShare && textToShare !== "Clique no botão para receber a primeira pergunta e começar a conversa!" && textToShare !== "Nenhuma pergunta encontrada para os filtros selecionados.") {
                 if (navigator.share) {
                     navigator.share({
                         title: 'Puxa Conversa',
-                        text: textToShare
+                        text: shareText
                     }).catch(error => console.log('Erro ao compartilhar', error));
                 } else if (navigator.clipboard) {
-                    navigator.clipboard.writeText(textToShare).then(() => {
+                    navigator.clipboard.writeText(shareText).then(() => {
                         const msgBox = document.createElement('div');
                         msgBox.textContent = 'Pergunta copiada para a área de transferência! Cole onde desejar, como nos Stories do Instagram.';
                         msgBox.style.cssText = `

@@ -228,33 +228,44 @@
             values.forEach(filterValue => {
                 const button = document.createElement('button');
                 button.textContent = filterValue;
-                button.classList.add('px-4', 'py-2', 'rounded-full', 'bg-white', 'text-gray-800', 'font-semibold', 'text-sm', 'hover:bg-gray-200', 'transition-colors', 'duration-200', 'whitespace-nowrap');
+                
+                // Estilo padrão: contorno roxo, texto preto, fundo branco
+                button.classList.add('px-4', 'py-2', 'rounded-full', 'border-2', 'border-[#9801fd]', 'bg-white', 'text-gray-800', 'font-semibold', 'text-sm', 'hover:bg-gray-100', 'transition-colors', 'duration-200', 'whitespace-nowrap');
 
                 button.addEventListener('click', () => {
-                    if (filterValue === 'Todos') {
+                    const isTodosButton = filterValue === 'Todos';
+                    
+                    if (isTodosButton) {
                         activeFilters[key].clear();
-                        container.querySelectorAll('button').forEach(btn => btn.classList.remove('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white'));
-                        button.classList.add('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
+                        container.querySelectorAll('button').forEach(btn => {
+                            btn.classList.remove('bg-[#9801fd]', 'text-white');
+                            btn.classList.add('bg-white', 'text-gray-800');
+                        });
+                        button.classList.add('bg-[#9801fd]', 'text-white');
                     } else {
                         const todosButton = container.querySelector('button');
                         if (todosButton && todosButton.textContent === 'Todos') {
-                            todosButton.classList.remove('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
+                            todosButton.classList.remove('bg-[#9801fd]', 'text-white');
+                            todosButton.classList.add('bg-white', 'text-gray-800');
                         }
 
                         if (activeFilters[key].has(filterValue)) {
                             activeFilters[key].delete(filterValue);
-                            button.classList.remove('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
-                            button.classList.add('text-gray-800');
+                            button.classList.remove('bg-[#9801fd]', 'text-white');
+                            button.classList.add('bg-white', 'text-gray-800');
                         } else {
                             activeFilters[key].add(filterValue);
-                            button.classList.add('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
+                            button.classList.remove('bg-white', 'text-gray-800');
+                            button.classList.add('bg-[#9801fd]', 'text-white');
                         }
                     }
                     applyFilter();
                 });
                 container.appendChild(button);
             });
-            container.querySelector('button').classList.add('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
+            // Adiciona a classe de "selecionado" ao botão 'Todos' por padrão
+            container.querySelector('button').classList.remove('bg-white', 'text-gray-800');
+            container.querySelector('button').classList.add('bg-[#9801fd]', 'text-white');
         }
 
         function applyFilter() {

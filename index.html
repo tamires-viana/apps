@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puxa Conversa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             transition: background-image 1s ease-in-out;
         }
 
@@ -26,15 +26,20 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen text-gray-800 p-4">
     <div class="flex flex-col lg:flex-row w-full max-w-7xl gap-6">
         <!-- Main Application Panel -->
-        <div id="app-container" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-2/3 flex flex-col items-center text-center text-white transition-all duration-700 ease-in-out">
+        <div id="app-container" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-2/3 flex flex-col items-center text-center transition-all duration-700 ease-in-out">
+            <!-- Logo -->
+            <!-- Por favor, substitua a URL abaixo pela URL direta do seu logo. -->
+            <!-- O link do Google Drive fornecido não funciona diretamente para imagens. -->
+            <img src="https://placehold.co/200x50/A96F7C/ffffff?text=Logo" alt="Logo da Significativamente" class="mb-6 h-12">
+            
             <!-- Título do aplicativo -->
             <h1 class="text-4xl font-bold mb-6 text-gray-800">Puxa Conversa</h1>
 
             <!-- Filtros -->
-            <div class="w-full mb-6">
-                <h2 class="text-xl font-semibold mb-2 text-gray-800">Origem</h2>
+            <div class="w-full mb-6 text-gray-800">
+                <h2 class="text-xl font-semibold mb-2">Origem</h2>
                 <div id="origem-filter-container" class="flex flex-wrap justify-center gap-2 mb-4"></div>
-                <h2 class="text-xl font-semibold mb-2 text-gray-800">Tema</h2>
+                <h2 class="text-xl font-semibold mb-2">Tema</h2>
                 <div id="tema-filter-container" class="flex flex-wrap justify-center gap-2 mb-4"></div>
             </div>
 
@@ -49,30 +54,30 @@
             </div>
 
             <!-- Botão para gerar a próxima pergunta -->
-            <button id="next-question-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 mb-4">
+            <button id="next-question-btn" class="bg-[#543864] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 mb-4">
                 Surpreenda-me!
             </button>
 
             <!-- Botões de Compartilhamento -->
             <div class="flex gap-4">
-                <button id="whatsapp-share-btn" class="bg-green-500 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <button id="whatsapp-share-btn" class="bg-[#8A4F7D] text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                     <span class="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946l.003-.018c.001-4.832 3.844-8.761 8.675-8.761h.004c2.815 0 5.405 1.109 7.35 3.064 1.945 1.954 3.044 4.544 3.041 7.356v.003c-.001 4.832-3.931 8.76-8.763 8.761-1.928.001-3.827-.686-5.385-2.062l-6.223 1.623zm1.614-5.266l-.001.005-.187-.052-1.282.336 1.349-4.912c.983.565 2.102.88 3.253.882h.001l.004-.002c4.114 0 7.464-3.356 7.462-7.47v-.002c-.001-2.049-.806-3.968-2.259-5.424-1.45-1.455-3.37-2.261-5.424-2.262h-.001c-4.116 0-7.466 3.356-7.466 7.47.001 2.052.808 3.968 2.26 5.424l.001-.001.002.001z"/>
-                    </svg>
-                    WhatsApp
-                </span>
-            </button>
-            <button id="share-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                <span class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.16.09-.32.09-.49s-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2c0 .17.04.33.09.49L7.96 9.83C7.44 9.35 6.76 9.05 6 9.05c-1.1 0-2 .9-2 2s.9 2 2 2c.76 0 1.44-.3 1.96-.77l7.05 4.11c-.05.16-.09.32-.09.49s.04.33.09.49l-7.05-4.11c-.52-.48-1.2-.77-1.96-.77-1.1 0-2 .9-2 2s.9 2 2 2c0-.17-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2z"/>
-                    </svg>
-                    Compartilhar
-                </span>
-            </button>
+                        </svg>
+                        WhatsApp
+                    </span>
+                </button>
+                <button id="share-btn" class="bg-[#A96F7C] text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.16.09-.32.09-.49s-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2c0 .17.04.33.09.49L7.96 9.83C7.44 9.35 6.76 9.05 6 9.05c-1.1 0-2 .9-2 2s.9 2 2 2c.76 0 1.44-.3 1.96-.77l7.05 4.11c-.05.16-.09.32-.09.49s.04.33.09.49l-7.05-4.11c-.52-.48-1.2-.77-1.96-.77-1.1 0-2 .9-2 2s.9 2 2 2c0-.17-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+                        </svg>
+                        Compartilhar
+                    </span>
+                </button>
+            </div>
         </div>
-    </div>
     
         <!-- Painel do Histórico -->
         <div id="history-panel" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-1/3 text-gray-800 hidden lg:block overflow-y-auto max-h-screen">
@@ -95,11 +100,11 @@
         const MAX_HISTORY_ITEMS = 5;
 
         const colorGradients = [
-            'linear-gradient(to right bottom, #3b82f6, #60a5fa, #93c5fd, #bfdbfe)',
-            'linear-gradient(to right bottom, #10b981, #34d399, #6ee7b7, #a7f3d0)',
-            'linear-gradient(to right bottom, #ef4444, #f87171, #fca5a5, #fecaca)',
-            'linear-gradient(to right bottom, #f59e0b, #fbbf24, #fcd34d, #fde68a)',
-            'linear-gradient(to right bottom, #8b5cf6, #a78bfa, #c4b5fd, #ddd6fe)'
+            'linear-gradient(to right bottom, #543864, #8A4F7D)', // Paleta da sua marca
+            'linear-gradient(to right bottom, #8A4F7D, #A96F7C)',
+            'linear-gradient(to right bottom, #A96F7C, #D88661)',
+            'linear-gradient(to right bottom, #D88661, #5B86B8)',
+            'linear-gradient(to right bottom, #5B86B8, #543864)'
         ];
 
         const emojiMap = {
@@ -255,32 +260,33 @@
             values.forEach(filterValue => {
                 const button = document.createElement('button');
                 button.textContent = filterValue;
-                button.classList.add('px-4', 'py-2', 'rounded-full', 'bg-white', 'text-blue-600', 'font-semibold', 'text-sm', 'hover:bg-blue-100', 'transition-colors', 'duration-200', 'whitespace-nowrap');
+                button.classList.add('px-4', 'py-2', 'rounded-full', 'bg-white', 'text-gray-800', 'font-semibold', 'text-sm', 'hover:bg-gray-200', 'transition-colors', 'duration-200', 'whitespace-nowrap');
 
                 button.addEventListener('click', () => {
                     if (filterValue === 'Todos') {
                         activeFilters[key].clear();
-                        container.querySelectorAll('button').forEach(btn => btn.classList.remove('border-2', 'border-blue-600', 'bg-blue-600', 'text-white'));
-                        button.classList.add('border-2', 'border-blue-600', 'bg-blue-600', 'text-white');
+                        container.querySelectorAll('button').forEach(btn => btn.classList.remove('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white'));
+                        button.classList.add('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
                     } else {
                         const todosButton = container.querySelector('button');
                         if (todosButton && todosButton.textContent === 'Todos') {
-                            todosButton.classList.remove('border-2', 'border-blue-600', 'bg-blue-600', 'text-white');
+                            todosButton.classList.remove('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
                         }
 
                         if (activeFilters[key].has(filterValue)) {
                             activeFilters[key].delete(filterValue);
-                            button.classList.remove('border-2', 'border-blue-600', 'bg-blue-600', 'text-white');
+                            button.classList.remove('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
+                            button.classList.add('text-gray-800'); // Corrigir a cor do texto ao desmarcar
                         } else {
                             activeFilters[key].add(filterValue);
-                            button.classList.add('border-2', 'border-blue-600', 'bg-blue-600', 'text-white');
+                            button.classList.add('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
                         }
                     }
                     applyFilter();
                 });
                 container.appendChild(button);
             });
-            container.querySelector('button').classList.add('border-2', 'border-blue-600', 'bg-blue-600', 'text-white');
+            container.querySelector('button').classList.add('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
         }
 
         function applyFilter() {
@@ -313,7 +319,7 @@
             historyList.innerHTML = '';
             questionHistory.forEach(q => {
                 const li = document.createElement('li');
-                li.className = 'border-l-4 border-blue-600 pl-4 py-2 text-sm text-gray-700';
+                li.className = 'border-l-4 border-[#543864] pl-4 py-2 text-sm text-gray-700';
                 li.textContent = q;
                 historyList.appendChild(li);
             });
@@ -338,12 +344,10 @@
                 }
                 const csvContent = await response.text();
                 allQuestions = parseCSV(csvContent);
-                console.log('Perguntas carregadas:', allQuestions.length);
                 createFilterButtons('origem-filter-container', allQuestions, 'origem');
                 createFilterButtons('tema-filter-container', allQuestions, 'temas');
                 applyFilter();
                 changeBackgroundColor();
-                console.log("Aplicativo inicializado com sucesso.");
             } catch (error) {
                 console.error("Erro ao carregar o arquivo CSV:", error);
                 questionTextElement.textContent = "Erro ao carregar as perguntas. Por favor, verifique se o link do CSV está correto.";

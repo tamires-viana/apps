@@ -63,7 +63,7 @@
     </div>
 
     <script>
-        const csvFileUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTA6rLAP6GbKi2fQI20XI1HYcSoNWalUHI-blYsORqXIG8hH5owmULSqeDT5iaJAhKjuwIl0i2Np0k/pub?output=csv';
+        const csvFileUrl = './Puxa Conversa | Base consolidada - Página1.csv';
         let allQuestions = [];
         let filteredQuestions = [];
         let activeFilters = { origem: new Set(), temas: new Set() };
@@ -168,30 +168,36 @@
 
         // Função para parsear o CSV e extrair as perguntas e metadados
         function parseCSV(csv) {
-            const lines = csv.trim().split('\n');
             const data = [];
-            const header = lines[0].split(',').map(h => h.replace(/"/g, ''));
-            
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i];
-                if (!line.trim()) continue;
+            const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
 
-                const parts = line.match(/"[^"]*"/g);
-                if (!parts || parts.length < 3) {
-                    console.warn('Linha inválida no CSV:', line);
-                    continue;
+            // Regex para capturar campos, incluindo aqueles entre aspas
+            const regex = /"([^"]*)"|([^,]*)/g;
+
+            lines.forEach((line, index) => {
+                if (index === 0) return; // Pular o cabeçalho
+                
+                let match;
+                const row = [];
+                while ((match = regex.exec(line)) !== null) {
+                    // O primeiro grupo de captura (match[1]) é para o texto entre aspas.
+                    // O segundo grupo (match[2]) é para o texto sem aspas.
+                    const value = match[1] || match[2];
+                    if (value !== undefined && value.trim() !== '') {
+                        row.push(value.trim());
+                    }
                 }
 
-                const origem = parts[0].replace(/"/g, '').trim();
-                const pergunta = parts[1].replace(/"/g, '').trim();
-                const temas = parts[2].replace(/"/g, '').trim();
-
-                data.push({
-                    origem: origem,
-                    pergunta: pergunta,
-                    temas: temas
-                });
-            }
+                if (row.length >= 3) {
+                    data.push({
+                        origem: row[0],
+                        pergunta: row[1],
+                        temas: row[2]
+                    });
+                } else {
+                    console.warn(`Linha inválida (pular): ${line}`);
+                }
+            });
             return data;
         }
 
@@ -202,7 +208,7 @@
                     item[key].split(',').forEach(value => uniqueValues.add(value.trim()));
                 }
             });
-            return ['Todos', ...Array.from(uniqueValues)];
+            return ['Todos', ...Array.from(uniqueValues).sort()];
         }
 
         function createFilterButtons(containerId, data, key) {
@@ -213,7 +219,7 @@
             values.forEach(filterValue => {
                 const button = document.createElement('button');
                 button.textContent = filterValue;
-                button.classList.add('px-4', 'py-2', 'rounded-full', 'bg-white', 'text-blue-600', 'font-semibold', 'text-sm', 'hover:bg-blue-100', 'transition-colors', 'duration-200');
+                button.classList.add('px-4', 'py-2', 'rounded-full', 'bg-white', 'text-blue-600', 'font-semibold', 'text-sm', 'hover:bg-blue-100', 'transition-colors', 'duration-200', 'whitespace-nowrap');
 
                 button.addEventListener('click', () => {
                     if (filterValue === 'Todos') {
@@ -278,6 +284,7 @@
                 }
                 const csvContent = await response.text();
                 allQuestions = parseCSV(csvContent);
+                console.log('Perguntas carregadas:', allQuestions.length);
                 createFilterButtons('origem-filter-container', allQuestions, 'origem');
                 createFilterButtons('tema-filter-container', allQuestions, 'temas');
                 applyFilter();

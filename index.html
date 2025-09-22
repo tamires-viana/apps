@@ -51,6 +51,10 @@
                 <p id="question-text" class="text-2xl font-medium leading-relaxed italic">
                     Clique no botão para receber a primeira pergunta e começar a conversa!
                 </p>
+                <div id="question-details" class="text-sm text-gray-500 mt-4 flex-col items-center hidden">
+                    <p id="question-origin"></p>
+                    <p id="question-themes"></p>
+                </div>
             </div>
 
             <!-- Botão para gerar a próxima pergunta -->
@@ -197,6 +201,9 @@
         const whatsappShareBtn = document.getElementById('whatsapp-share-btn');
         const shareBtn = document.getElementById('share-btn');
         const historyList = document.getElementById('history-list');
+        const questionDetailsElement = document.getElementById('question-details');
+        const questionOriginElement = document.getElementById('question-origin');
+        const questionThemesElement = document.getElementById('question-themes');
 
         // Função para parsear o CSV e extrair as perguntas e metadados
         function parseCSV(csv) {
@@ -304,23 +311,38 @@
             questionCountElement.textContent = `${count} ${text}`;
             if (count === 0) {
                 questionTextElement.textContent = "Nenhuma pergunta encontrada para os filtros selecionados.";
+                questionDetailsElement.classList.add('hidden');
             }
         }
         
-        function updateHistory(question) {
+        function updateHistory(questionData) {
             if (questionHistory.length >= MAX_HISTORY_ITEMS) {
                 questionHistory.shift(); 
             }
-            questionHistory.push(question);
+            questionHistory.push(questionData);
             renderHistory();
         }
         
         function renderHistory() {
             historyList.innerHTML = '';
-            questionHistory.forEach(q => {
+            questionHistory.slice().reverse().forEach(q => {
                 const li = document.createElement('li');
                 li.className = 'border-l-4 border-[#543864] pl-4 py-2 text-sm text-gray-700';
-                li.textContent = q;
+                
+                const originEl = document.createElement('p');
+                originEl.className = 'font-bold text-[#543864]';
+                originEl.textContent = `Origem: ${q.origem}`;
+
+                const temasEl = document.createElement('p');
+                temasEl.className = 'text-gray-500 italic mb-1';
+                temasEl.textContent = `Temas: ${q.temas}`;
+
+                const questionEl = document.createElement('p');
+                questionEl.textContent = q.pergunta;
+
+                li.appendChild(originEl);
+                li.appendChild(temasEl);
+                li.appendChild(questionEl);
                 historyList.appendChild(li);
             });
         }
@@ -367,14 +389,19 @@
                 
                 setTimeout(() => {
                     questionTextElement.textContent = randomQuestion;
+                    questionOriginElement.textContent = `Origem: ${questionData.origem}`;
+                    questionThemesElement.textContent = `Temas: ${questionData.temas}`;
+                    questionDetailsElement.classList.remove('hidden');
+                    questionDetailsElement.classList.add('flex');
                     questionCard.classList.remove('opacity-0', 'scale-95');
                 }, 300);
                 
                 changeBackgroundColor();
-                updateHistory(randomQuestion);
+                updateHistory(questionData);
 
             } else {
                 questionTextElement.textContent = "Nenhuma pergunta encontrada para os filtros selecionados.";
+                questionDetailsElement.classList.add('hidden');
             }
         });
 

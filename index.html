@@ -9,17 +9,6 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            transition: background-image 1s ease-in-out;
-        }
-
-        @media (max-width: 1024px) {
-            .main-content {
-                flex-direction: column;
-            }
-            .main-content > div {
-                width: 100%;
-                margin-bottom: 1.5rem;
-            }
         }
     </style>
 </head>
@@ -28,9 +17,7 @@
         <!-- Main Application Panel -->
         <div id="app-container" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-2/3 flex flex-col items-center text-center transition-all duration-700 ease-in-out">
             <!-- Logo -->
-            <!-- Por favor, substitua a URL abaixo pela URL direta do seu logo. -->
-            <!-- O link do Google Drive fornecido não funciona diretamente para imagens. -->
-            <img src="https://placehold.co/200x50/A96F7C/ffffff?text=Logo" alt="Logo da Significativamente" class="mb-6 h-12">
+            <img src="https://tamires-viana.github.io/apps/Logo%20Significativamente%20v2.png" alt="Logo da Significativamente" class="mb-6 h-12">
             
             <!-- Título do aplicativo -->
             <h1 class="text-4xl font-bold mb-6 text-gray-800">Puxa Conversa</h1>
@@ -47,38 +34,28 @@
             <p id="question-count" class="text-lg font-medium text-gray-600 mb-4">0 perguntas disponíveis.</p>
 
             <!-- Card da Pergunta -->
-            <div id="question-card" class="bg-white/90 backdrop-blur-sm rounded-2xl p-8 mb-8 w-full min-h-[200px] flex flex-col items-center justify-center shadow-lg transition-all duration-300 transform scale-100 text-gray-800 border border-gray-200">
+            <div id="question-card" class="bg-[#414141] rounded-2xl p-8 mb-8 w-full min-h-[200px] flex flex-col items-center justify-center shadow-lg transition-all duration-300 transform scale-100 text-white border border-gray-200">
                 <p id="question-text" class="text-2xl font-medium leading-relaxed italic">
                     Clique no botão para receber a primeira pergunta e começar a conversa!
                 </p>
-                <div id="question-details" class="text-sm text-gray-500 mt-4 flex-col items-center hidden">
+                <div id="question-details" class="text-sm text-gray-200 mt-4 flex-col items-center hidden">
                     <p id="question-origin"></p>
                     <p id="question-themes"></p>
                 </div>
             </div>
 
             <!-- Botão para gerar a próxima pergunta -->
-            <button id="next-question-btn" class="bg-[#543864] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 mb-4">
+            <button id="next-question-btn" class="bg-[#9801fd] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 mb-4">
                 Surpreenda-me!
             </button>
 
             <!-- Botões de Compartilhamento -->
             <div class="flex gap-4">
-                <button id="whatsapp-share-btn" class="bg-[#8A4F7D] text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    <span class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946l.003-.018c.001-4.832 3.844-8.761 8.675-8.761h.004c2.815 0 5.405 1.109 7.35 3.064 1.945 1.954 3.044 4.544 3.041 7.356v.003c-.001 4.832-3.931 8.76-8.763 8.761-1.928.001-3.827-.686-5.385-2.062l-6.223 1.623zm1.614-5.266l-.001.005-.187-.052-1.282.336 1.349-4.912c.983.565 2.102.88 3.253.882h.001l.004-.002c4.114 0 7.464-3.356 7.462-7.47v-.002c-.001-2.049-.806-3.968-2.259-5.424-1.45-1.455-3.37-2.261-5.424-2.262h-.001c-4.116 0-7.466 3.356-7.466 7.47.001 2.052.808 3.968 2.26 5.424l.001-.001.002.001z"/>
-                        </svg>
-                        WhatsApp
-                    </span>
+                <button id="whatsapp-share-btn" class="bg-[#25D366] text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center gap-2">💬 WhatsApp</span>
                 </button>
-                <button id="share-btn" class="bg-[#A96F7C] text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    <span class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.16.09-.32.09-.49s-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2c0 .17.04.33.09.49L7.96 9.83C7.44 9.35 6.76 9.05 6 9.05c-1.1 0-2 .9-2 2s.9 2 2 2c.76 0 1.44-.3 1.96-.77l7.05 4.11c-.05.16-.09.32-.09.49s.04.33.09.49l-7.05-4.11c-.52-.48-1.2-.77-1.96-.77-1.1 0-2 .9-2 2s.9 2 2 2c0-.17-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2z"/>
-                        </svg>
-                        Compartilhar
-                    </span>
+                <button id="share-btn" class="bg-black text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center gap-2">🔗 Compartilhar</span>
                 </button>
             </div>
         </div>
@@ -93,23 +70,12 @@
     </div>
 
     <script>
-        // Agora, o aplicativo usa o link público da sua planilha no Google Drive.
-        // A mudança no nome do arquivo no Drive não afeta este link, pois ele é gerado
-        // automaticamente pelo Google Sheets.
         const csvFileUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTA6rLAP6GbKi2fQI20XI1HYcSoNWalUHI-blYsORqXIG8hH5owmULSqeDT5iaJAhKjuwIl0i2Np0k/pub?output=csv';
         let allQuestions = [];
         let filteredQuestions = [];
         let activeFilters = { origem: new Set(), temas: new Set() };
         let questionHistory = [];
         const MAX_HISTORY_ITEMS = 5;
-
-        const colorGradients = [
-            'linear-gradient(to right bottom, #543864, #8A4F7D)', // Paleta da sua marca
-            'linear-gradient(to right bottom, #8A4F7D, #A96F7C)',
-            'linear-gradient(to right bottom, #A96F7C, #D88661)',
-            'linear-gradient(to right bottom, #D88661, #5B86B8)',
-            'linear-gradient(to right bottom, #5B86B8, #543864)'
-        ];
 
         const emojiMap = {
             'Amor/Relacionamentos': '❤️',
@@ -191,8 +157,6 @@
             'Cotidiano/Preferências': '👍'
         };
 
-        let lastColorIndex = -1;
-
         // Elementos da página
         const questionTextElement = document.getElementById('question-text');
         const nextQuestionBtn = document.getElementById('next-question-btn');
@@ -208,8 +172,6 @@
         // Função para parsear o CSV e extrair as perguntas e metadados
         function parseCSV(csv) {
             const data = [];
-            let inQuote = false;
-            let field = '';
             const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
 
             lines.forEach((line, index) => {
@@ -222,7 +184,6 @@
                 for (let i = 0; i < line.length; i++) {
                     const char = line[i];
                     if (char === '"') {
-                        // Tratar aspas duplas, tanto no início/fim quanto dentro do campo
                         if (inQuote && line[i + 1] === '"') {
                             field += '"';
                             i++;
@@ -272,28 +233,28 @@
                 button.addEventListener('click', () => {
                     if (filterValue === 'Todos') {
                         activeFilters[key].clear();
-                        container.querySelectorAll('button').forEach(btn => btn.classList.remove('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white'));
-                        button.classList.add('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
+                        container.querySelectorAll('button').forEach(btn => btn.classList.remove('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white'));
+                        button.classList.add('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
                     } else {
                         const todosButton = container.querySelector('button');
                         if (todosButton && todosButton.textContent === 'Todos') {
-                            todosButton.classList.remove('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
+                            todosButton.classList.remove('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
                         }
 
                         if (activeFilters[key].has(filterValue)) {
                             activeFilters[key].delete(filterValue);
-                            button.classList.remove('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
-                            button.classList.add('text-gray-800'); // Corrigir a cor do texto ao desmarcar
+                            button.classList.remove('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
+                            button.classList.add('text-gray-800');
                         } else {
                             activeFilters[key].add(filterValue);
-                            button.classList.add('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
+                            button.classList.add('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
                         }
                     }
                     applyFilter();
                 });
                 container.appendChild(button);
             });
-            container.querySelector('button').classList.add('border-2', 'border-[#543864]', 'bg-[#543864]', 'text-white');
+            container.querySelector('button').classList.add('border-2', 'border-[#9801fd]', 'bg-[#9801fd]', 'text-white');
         }
 
         function applyFilter() {
@@ -327,10 +288,10 @@
             historyList.innerHTML = '';
             questionHistory.slice().reverse().forEach(q => {
                 const li = document.createElement('li');
-                li.className = 'border-l-4 border-[#543864] pl-4 py-2 text-sm text-gray-700';
+                li.className = 'border-l-4 border-[#9801fd] pl-4 py-2 text-sm text-gray-700';
                 
                 const originEl = document.createElement('p');
-                originEl.className = 'font-bold text-[#543864]';
+                originEl.className = 'font-bold text-[#9801fd]';
                 originEl.textContent = `Origem: ${q.origem}`;
 
                 const temasEl = document.createElement('p');
@@ -347,17 +308,6 @@
             });
         }
 
-        function changeBackgroundColor() {
-            let newColorIndex;
-            do {
-                newColorIndex = Math.floor(Math.random() * colorGradients.length);
-            } while (newColorIndex === lastColorIndex);
-            
-            lastColorIndex = newColorIndex;
-            const appContainer = document.getElementById('app-container');
-            appContainer.style.backgroundImage = colorGradients[newColorIndex];
-        }
-
         async function loadAndInitialize() {
             try {
                 const response = await fetch(csvFileUrl);
@@ -369,14 +319,12 @@
                 createFilterButtons('origem-filter-container', allQuestions, 'origem');
                 createFilterButtons('tema-filter-container', allQuestions, 'temas');
                 applyFilter();
-                changeBackgroundColor();
             } catch (error) {
                 console.error("Erro ao carregar o arquivo CSV:", error);
                 questionTextElement.textContent = "Erro ao carregar as perguntas. Por favor, verifique se o link do CSV está correto.";
             }
         }
         
-        // Adicionar o evento de clique ao botão de próxima pergunta
         nextQuestionBtn.addEventListener('click', () => {
             if (filteredQuestions.length > 0) {
                 const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
@@ -396,7 +344,6 @@
                     questionCard.classList.remove('opacity-0', 'scale-95');
                 }, 300);
                 
-                changeBackgroundColor();
                 updateHistory(questionData);
 
             } else {
@@ -405,7 +352,6 @@
             }
         });
 
-        // Adicionar eventos de clique aos botões de compartilhamento
         whatsappShareBtn.addEventListener('click', () => {
             const text = questionTextElement.textContent;
             const shareText = `Olha que legal essa pergunta: ${text}`;

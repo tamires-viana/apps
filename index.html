@@ -54,7 +54,7 @@
             <button id="share-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                 <span class="flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.16.09-.32.09-.49s-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2c0 .17.04.33.09.49L7.96 9.83C7.44 9.35 6.76 9.05 6 9.05c-1.1 0-2 .9-2 2s.9 2 2 2c.76 0 1.44-.3 1.96-.77l7.05 4.11c-.05.16-.09.32-.09.49s.04.33.09.49l-7.05-4.11c-.52.48-1.2-.77-1.96-.77-1.1 0-2 .9-2 2s.9 2 2 2c0-.17-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.16.09-.32.09-.49s-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2c0 .17.04.33.09.49L7.96 9.83C7.44 9.35 6.76 9.05 6 9.05c-1.1 0-2 .9-2 2s.9 2 2 2c.76 0 1.44-.3 1.96-.77l7.05 4.11c-.05.16-.09.32-.09.49s.04.33.09.49l-7.05-4.11c-.52-.48-1.2-.77-1.96-.77-1.1 0-2 .9-2 2s.9 2 2 2c0-.17-.04-.33-.09-.49l7.05-4.11c.52.48 1.2.77 1.96.77 1.1 0 2-.9 2-2s-.9-2-2-2z"/>
                     </svg>
                     Compartilhar
                 </span>
@@ -63,13 +63,8 @@
     </div>
 
     <script>
-        // INSTRUÇÕES:
-        // 1. Abra a sua planilha do Google Sheets.
-        // 2. Copie o ID da planilha que está na URL, entre "/d/" e "/edit".
-        // 3. Substitua o "SEU_ID_DA_PLANILHA_AQUI" abaixo por esse ID.
-        // O link de download direto garantirá que o aplicativo leia o conteúdo do CSV.
-        const spreadsheetId = '18tDk6CJVF6zEQxd9BoXoVh3AQL29J8ElPzMAXhdIOc8';
-        const csvFileUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`;
+        // URL da sua planilha do Google Sheets publicada em formato CSV
+        const csvFileUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTA6rLAP6GbKi2fQI20XI1HYcSoNWalUHI-blYsORqXIG8hH5owmULSqeDT5iaJAhKjuwIl0i2Np0k/pub?output=csv';
 
         let allQuestions = [];
         let filteredQuestions = [];

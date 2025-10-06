@@ -10,11 +10,21 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        /* Estilo para botões desabilitados que não podem ser clicados */
+        .filter-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(100%);
+            border-color: #d1d5db; /* Cor cinza clara para o contorno */
+            color: #d1d5db; /* Cor cinza clara para o texto */
+            background-color: #f3f4f6; /* Fundo levemente cinza */
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen text-gray-800 p-4">
     <div class="flex flex-col lg:flex-row w-full max-w-7xl gap-6">
-        <!-- Main Application Panel -->
+        <!-- Main Application Panel (Inclui Histórico no final para mobile) -->
         <div id="app-container" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-2/3 flex flex-col items-center text-center transition-all duration-700 ease-in-out">
             <!-- Logo -->
             <img src="https://tamires-viana.github.io/apps/Logo%20Significativamente%20v2.png" alt="Logo da Significativamente" class="mb-6 h-12">
@@ -50,7 +60,7 @@
             </button>
 
             <!-- Botões de Compartilhamento -->
-            <div class="flex gap-4">
+            <div class="flex gap-4 mb-8">
                 <button id="whatsapp-share-btn" class="bg-[#25D366] text-white font-bold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                     <span class="flex items-center gap-2">💬 WhatsApp</span>
                 </button>
@@ -58,12 +68,20 @@
                     <span class="flex items-center gap-2">🔗 Compartilhar</span>
                 </button>
             </div>
+
+            <!-- Painel do Histórico (Movemos para cá para o mobile) -->
+            <div id="history-panel-mobile" class="bg-gray-50 rounded-2xl shadow-inner p-6 w-full text-gray-800 lg:hidden block mt-4">
+                <h2 class="text-xl font-bold mb-4 border-b pb-2 border-gray-200">Histórico</h2>
+                <ul id="history-list-mobile" class="list-none p-0 space-y-4">
+                    <!-- Perguntas do histórico serão inseridas aqui -->
+                </ul>
+            </div>
         </div>
     
-        <!-- Painel do Histórico -->
-        <div id="history-panel" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-1/3 text-gray-800 hidden lg:block overflow-y-auto max-h-screen">
+        <!-- Painel do Histórico (Versão Desktop - Mantida na lateral) -->
+        <div id="history-panel-desktop" class="bg-white rounded-3xl shadow-xl p-8 w-full lg:w-1/3 text-gray-800 hidden lg:block overflow-y-auto max-h-screen">
             <h2 class="text-xl font-bold mb-4">Histórico de Perguntas</h2>
-            <ul id="history-list" class="list-none p-0 space-y-4">
+            <ul id="history-list-desktop" class="list-none p-0 space-y-4">
                 <!-- Perguntas do histórico serão inseridas aqui -->
             </ul>
         </div>
@@ -77,6 +95,7 @@
         let questionHistory = [];
         const MAX_HISTORY_ITEMS = 5;
 
+        // Mapeamento de emojis
         const emojiMap = {
             'Amor/Relacionamentos': '❤️',
             'Autoconhecimento': '🧠',
@@ -164,12 +183,15 @@
         const questionCountElement = document.getElementById('question-count');
         const whatsappShareBtn = document.getElementById('whatsapp-share-btn');
         const shareBtn = document.getElementById('share-btn');
-        const historyList = document.getElementById('history-list');
+        const historyListDesktop = document.getElementById('history-list-desktop');
+        const historyListMobile = document.getElementById('history-list-mobile');
         const questionDetailsElement = document.getElementById('question-details');
         const questionOriginElement = document.getElementById('question-origin');
         const questionThemesElement = document.getElementById('question-themes');
+        const origemFilterContainer = document.getElementById('origem-filter-container');
+        const temaFilterContainer = document.getElementById('tema-filter-container');
 
-        // Função para parsear o CSV e extrair as perguntas e metadados
+        // Função para parsear o CSV (mantida robusta)
         function parseCSV(csv) {
             const data = [];
             const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
@@ -210,6 +232,7 @@
             return data;
         }
 
+        // Função utilitária para obter valores únicos de um campo (incluindo subtemas)
         function getUniqueValues(data, key) {
             const uniqueValues = new Set();
             data.forEach(item => {
@@ -220,6 +243,98 @@
             return ['Todos', ...Array.from(uniqueValues).sort()];
         }
 
+        // Função de estilo de botão
+        function setButtonActive(button, isActive) {
+            if (isActive) {
+                button.classList.remove('bg-white', 'text-gray-800', 'filter-disabled');
+                button.classList.add('bg-[#9801fd]', 'text-white');
+            } else {
+                button.classList.remove('bg-[#9801fd]', 'text-white', 'filter-disabled');
+                button.classList.add('bg-white', 'text-gray-800');
+            }
+        }
+
+        // --- LÓGICA DE FILTROS CRUZADOS ---
+
+        function getAvailableFilterValues(keyToFilter, otherFilterKey) {
+            let availableValues = new Set();
+            
+            // 1. Determine o conjunto de perguntas que satisfazem o OUTRO filtro
+            let currentFilteredSet = allQuestions;
+            if (activeFilters[otherFilterKey].size > 0) {
+                currentFilteredSet = allQuestions.filter(q => {
+                    const filterValues = q[otherFilterKey].split(',').map(v => v.trim());
+                    // Verifica se pelo menos um valor do filtro ativo está presente na pergunta
+                    return Array.from(activeFilters[otherFilterKey]).some(activeVal => filterValues.includes(activeVal));
+                });
+            }
+
+            // 2. Coleta todos os valores do 'keyToFilter' dessas perguntas
+            currentFilteredSet.forEach(item => {
+                item[keyToFilter].split(',').forEach(value => availableValues.add(value.trim()));
+            });
+
+            return availableValues;
+        }
+
+        function updateFilterInteractivity() {
+            // Atualiza os botões de Tema com base nas Origens ativas
+            const availableTemas = getAvailableFilterValues('temas', 'origem');
+            temaFilterContainer.querySelectorAll('button').forEach(button => {
+                const value = button.textContent;
+                
+                if (value === 'Todos') return;
+
+                if (availableTemas.has(value)) {
+                    button.classList.remove('filter-disabled');
+                    if (!activeFilters.temas.has(value)) {
+                        setButtonActive(button, false);
+                    }
+                } else {
+                    // Desabilita e desmarca se não for mais relevante
+                    button.classList.add('filter-disabled');
+                    if (activeFilters.temas.has(value)) {
+                        activeFilters.temas.delete(value);
+                        setButtonActive(button, false);
+                    }
+                }
+            });
+            
+            // Atualiza os botões de Origem com base nos Temas ativos
+            const availableOrigens = getAvailableFilterValues('origem', 'temas');
+            origemFilterContainer.querySelectorAll('button').forEach(button => {
+                const value = button.textContent;
+                
+                if (value === 'Todos') return;
+
+                if (availableOrigens.has(value)) {
+                    button.classList.remove('filter-disabled');
+                    if (!activeFilters.origem.has(value)) {
+                        setButtonActive(button, false);
+                    }
+                } else {
+                    // Desabilita e desmarca se não for mais relevante
+                    button.classList.add('filter-disabled');
+                    if (activeFilters.origem.has(value)) {
+                        activeFilters.origem.delete(value);
+                        setButtonActive(button, false);
+                    }
+                }
+            });
+            
+            // Reativa o botão 'Todos' se todos os outros estiverem desabilitados ou nenhum filtro estiver ativo
+            const allTemasDisabled = Array.from(temaFilterContainer.querySelectorAll('button')).slice(1).every(btn => btn.classList.contains('filter-disabled'));
+            const allOrigensDisabled = Array.from(origemFilterContainer.querySelectorAll('button')).slice(1).every(btn => btn.classList.contains('filter-disabled'));
+            
+            if (activeFilters.origem.size === 0 || allOrigensDisabled) {
+                setButtonActive(origemFilterContainer.querySelector('button'), true);
+            }
+             if (activeFilters.temas.size === 0 || allTemasDisabled) {
+                setButtonActive(temaFilterContainer.querySelector('button'), true);
+            }
+        }
+
+        // Criação de Botões de Filtro
         function createFilterButtons(containerId, data, key) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -229,49 +344,61 @@
                 const button = document.createElement('button');
                 button.textContent = filterValue;
                 
-                // Estilo padrão: contorno roxo, texto preto, fundo branco
+                // Estilo padrão
                 button.classList.add('px-4', 'py-2', 'rounded-full', 'border-2', 'border-[#9801fd]', 'bg-white', 'text-gray-800', 'font-semibold', 'text-sm', 'hover:bg-gray-100', 'transition-colors', 'duration-200', 'whitespace-nowrap');
+
+                // Garante que o botão "Todos" comece ativo
+                if (filterValue === 'Todos') {
+                    setButtonActive(button, true);
+                }
 
                 button.addEventListener('click', () => {
                     const isTodosButton = filterValue === 'Todos';
                     
                     if (isTodosButton) {
+                        // Desseleciona todos os outros e seleciona "Todos"
                         activeFilters[key].clear();
-                        container.querySelectorAll('button').forEach(btn => {
-                            btn.classList.remove('bg-[#9801fd]', 'text-white');
-                            btn.classList.add('bg-white', 'text-gray-800');
-                        });
-                        button.classList.add('bg-[#9801fd]', 'text-white');
+                        container.querySelectorAll('button').forEach(btn => setButtonActive(btn, false));
+                        setButtonActive(button, true);
                     } else {
+                        // Desseleciona "Todos" e gerencia o estado do botão clicado
                         const todosButton = container.querySelector('button');
                         if (todosButton && todosButton.textContent === 'Todos') {
-                            todosButton.classList.remove('bg-[#9801fd]', 'text-white');
-                            todosButton.classList.add('bg-white', 'text-gray-800');
+                            setButtonActive(todosButton, false);
                         }
 
                         if (activeFilters[key].has(filterValue)) {
                             activeFilters[key].delete(filterValue);
-                            button.classList.remove('bg-[#9801fd]', 'text-white');
-                            button.classList.add('bg-white', 'text-gray-800');
+                            setButtonActive(button, false);
                         } else {
                             activeFilters[key].add(filterValue);
-                            button.classList.remove('bg-white', 'text-gray-800');
-                            button.classList.add('bg-[#9801fd]', 'text-white');
+                            setButtonActive(button, true);
                         }
                     }
+                    
+                    // Se nenhum filtro individual estiver ativo, reativa o 'Todos'
+                    if (activeFilters[key].size === 0 && !isTodosButton) {
+                        setButtonActive(container.querySelector('button'), true);
+                    }
+                    
+                    // Aplica e atualiza a interatividade
                     applyFilter();
+                    updateFilterInteractivity();
                 });
                 container.appendChild(button);
             });
-            // Adiciona a classe de "selecionado" ao botão 'Todos' por padrão
-            container.querySelector('button').classList.remove('bg-white', 'text-gray-800');
-            container.querySelector('button').classList.add('bg-[#9801fd]', 'text-white');
         }
 
+
+        // Aplicação e Contagem
         function applyFilter() {
             filteredQuestions = allQuestions.filter(q => {
-                const isOrigemMatch = activeFilters.origem.size === 0 || activeFilters.origem.has(q.origem);
-                const isTemasMatch = activeFilters.temas.size === 0 || q.temas.split(',').some(theme => activeFilters.temas.has(theme.trim()));
+                // Filtro 1: Origem (Coluna A)
+                const isOrigemMatch = activeFilters.origem.size === 0 || Array.from(activeFilters.origem).some(activeVal => activeVal === q.origem);
+                
+                // Filtro 2: Temas (Coluna C, que pode ter múltiplos valores separados por vírgula)
+                const isTemasMatch = activeFilters.temas.size === 0 || q.temas.split(',').some(theme => Array.from(activeFilters.temas).includes(theme.trim()));
+                
                 return isOrigemMatch && isTemasMatch;
             });
             updateQuestionCount();
@@ -287,6 +414,7 @@
             }
         }
         
+        // Histórico
         function updateHistory(questionData) {
             if (questionHistory.length >= MAX_HISTORY_ITEMS) {
                 questionHistory.shift(); 
@@ -296,8 +424,13 @@
         }
         
         function renderHistory() {
-            historyList.innerHTML = '';
-            questionHistory.slice().reverse().forEach(q => {
+            // Limpa ambos os painéis (desktop e mobile)
+            historyListDesktop.innerHTML = '';
+            historyListMobile.innerHTML = '';
+
+            const reversedHistory = questionHistory.slice().reverse();
+
+            reversedHistory.forEach(q => {
                 const li = document.createElement('li');
                 li.className = 'border-l-4 border-[#9801fd] pl-4 py-2 text-sm text-gray-700';
                 
@@ -310,15 +443,24 @@
                 temasEl.textContent = `Temas: ${q.temas}`;
 
                 const questionEl = document.createElement('p');
-                questionEl.textContent = q.pergunta;
+                
+                // Adiciona emoji ao histórico
+                const themesArray = q.temas.split(',').map(t => t.trim());
+                let emoji = themesArray.map(t => emojiMap[t]).find(e => e) || '';
+                questionEl.textContent = `${emoji} ${q.pergunta}`;
 
+                // Ordem no Histórico: Origem > Tema > Pergunta
                 li.appendChild(originEl);
                 li.appendChild(temasEl);
                 li.appendChild(questionEl);
-                historyList.appendChild(li);
+                
+                // Clona para ambos os layouts
+                historyListDesktop.appendChild(li.cloneNode(true));
+                historyListMobile.appendChild(li);
             });
         }
 
+        // Inicialização
         async function loadAndInitialize() {
             try {
                 const response = await fetch(csvFileUrl);
@@ -327,15 +469,21 @@
                 }
                 const csvContent = await response.text();
                 allQuestions = parseCSV(csvContent);
+                
+                // Cria os botões e inicializa os filtros
                 createFilterButtons('origem-filter-container', allQuestions, 'origem');
                 createFilterButtons('tema-filter-container', allQuestions, 'temas');
+                
+                // O filtro inicial é sempre 'Todos', mas aplicamos aqui para atualizar contagem
                 applyFilter();
+                updateFilterInteractivity(); // Garante que a interatividade inicial esteja correta
             } catch (error) {
                 console.error("Erro ao carregar o arquivo CSV:", error);
                 questionTextElement.textContent = "Erro ao carregar as perguntas. Por favor, verifique se o link do CSV está correto.";
             }
         }
         
+        // Event Listeners
         nextQuestionBtn.addEventListener('click', () => {
             if (filteredQuestions.length > 0) {
                 const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
@@ -344,6 +492,7 @@
                 let emoji = themesArray.map(t => emojiMap[t]).find(e => e) || '';
                 const randomQuestion = `${emoji} ${questionData.pergunta}`;
                 
+                // Efeito visual de transição
                 questionCard.classList.add('opacity-0', 'scale-95');
                 
                 setTimeout(() => {
@@ -363,19 +512,28 @@
             }
         });
 
+        // Compartilhamento
+        function handleShare() {
+            const textToShare = questionTextElement.textContent;
+            const shareText = `Olha que legal essa pergunta: ${textToShare}`;
+            
+            if (textToShare && textToShare !== "Clique no botão para receber a primeira pergunta e começar a conversa!" && textToShare !== "Nenhuma pergunta encontrada para os filtros selecionados.") {
+                return shareText;
+            }
+            return null;
+        }
+
         whatsappShareBtn.addEventListener('click', () => {
-            const text = questionTextElement.textContent;
-            const shareText = `Olha que legal essa pergunta: ${text}`;
-            if (text && text !== "Clique no botão para receber a primeira pergunta e começar a conversa!" && text !== "Nenhuma pergunta encontrada para os filtros selecionados.") {
+            const shareText = handleShare();
+            if (shareText) {
                 const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
                 window.open(whatsappUrl, '_blank');
             }
         });
 
         shareBtn.addEventListener('click', () => {
-            const textToShare = questionTextElement.textContent;
-            const shareText = `Olha que legal essa pergunta: ${textToShare}`;
-            if (textToShare && textToShare !== "Clique no botão para receber a primeira pergunta e começar a conversa!" && textToShare !== "Nenhuma pergunta encontrada para os filtros selecionados.") {
+            const shareText = handleShare();
+            if (shareText) {
                 if (navigator.share) {
                     navigator.share({
                         title: 'Puxa Conversa',
@@ -402,23 +560,6 @@
                     }).catch(err => {
                         console.error('Erro ao copiar texto: ', err);
                     });
-                } else {
-                    const msgBox = document.createElement('div');
-                    msgBox.textContent = 'Seu navegador não suporta o compartilhamento automático. Por favor, copie e cole a pergunta manualmente.';
-                    msgBox.style.cssText = `
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background-color: #333;
-                        color: white;
-                        padding: 20px;
-                        border-radius: 10px;
-                        z-index: 1000;
-                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                    `;
-                    document.body.appendChild(msgBox);
-                    setTimeout(() => document.body.removeChild(msgBox), 3000);
                 }
             }
         });

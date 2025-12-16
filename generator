@@ -1,0 +1,329 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, Download, Sparkles, RefreshCw, Image as ImageIcon, Paintbrush, Eraser } from 'lucide-react';
+
+const App = () => {
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [promptModifier, setPromptModifier] = useState("padrão");
+  
+  const fileInputRef = useRef(null);
+  const apiKey = ""; // API Key injetada pelo ambiente
+
+  // Prompt base fornecido pelo usuário, otimizado para a API
+  // ATUALIZADO V6: Reforço EXTREMO para PRETO E BRANCO PURO.
+  const basePrompt = `Crie um desenho vetorial line art (desenho de linha) EXTREMAMENTE SIMPLIFICADO baseado nesta imagem.
+  
+  ESTILO ALVO: "Bobbie Goods" / Kawaii Coloring Book / Chunky Marker Style.
+
+  REGRA CRÍTICA E INEGOCIÁVEL: O RESULTADO DEVE SER 100% PRETO E BRANCO.
+  - Use APENAS linhas PRETAS PURAS (#000000).
+  - O fundo e TODO o preenchimento das formas devem ser BRANCO PURO (#FFFFFF).
+  - PROIBIDO: Qualquer outra cor, tons de cinza, sombreamento, hachuras, textura ou gradientes. O desenho deve parecer uma impressão monocromática de alta contraste.
+
+  INSTRUÇÕES PARA QUEBRAR O REALISMO:
+  1. IGNORE A FOTO REALISTA: Não tente copiar os detalhes. Olhe para a foto apenas para entender "o que é a cena" e desenhe uma versão cartoon infantil disso do zero.
+  2. TRAÇO "GORDUCHO": Use linhas pretas muito grossas e uniformes (como um marcador Sharpie grosso).
+  3. FORMAS BÁSICAS: Converta tudo em formas geométricas arredondadas.
+     - Pessoas -> Bonecos fofos com cabeças redondas grandes.
+     - Árvores -> Formas de nuvem simples.
+     - Móveis -> Retângulos com cantos arredondados.
+  4. ROSTOS: Use APENAS dois pontos para olhos e um traço simples para boca. NUNCA desenhe narizes, rugas ou pupilas.
+  5. FUNDO: Reduza o fundo a 2 ou 3 linhas simples ou objetos flutuantes fofos (estrelinhas, corações), tudo em linha preta sobre fundo branco.
+  
+  RESULTADO ESPERADO: Um desenho de colorir vetorial limpo, fofo e ESTRITAMENTE PRETO E BRANCO.`;
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError("A imagem é muito grande. Tente uma menor que 5MB.");
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSelectedImage(e.target.result);
+        setGeneratedImage(null);
+        setError(null);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const convertToBase64 = (dataUrl) => {
+    return dataUrl.split(',')[1];
+  };
+
+  const generateColoringPage = async () => {
+    if (!selectedImage) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Backoff strategy helper
+      const fetchWithRetry = async (url, options, retries = 3, backoff = 1000) => {
+        try {
+          const response = await fetch(url, options);
+          if (!response.ok) {
+            if (response.status === 429 || response.status >= 500) {
+              throw new Error(`Server error: ${response.status}`);
+            }
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'Erro na API');
+          }
+          return response.json();
+        } catch (err) {
+          if (retries > 0) {
+            await new Promise(r => setTimeout(r, backoff));
+            return fetchWithRetry(url, options, retries - 1, backoff * 2);
+          }
+          throw err;
+        }
+      };
+
+      const base64Image = convertToBase64(selectedImage);
+
+      const payload = {
+        contents: [
+          {
+            parts: [
+              { text: basePrompt },
+              {
+                inlineData: {
+                  mimeType: "image/jpeg", // Assume jpeg/png compatibilidade
+                  data: base64Image
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+            responseModalities: ["IMAGE"], // Força o retorno de imagem
+            // Aumentei para 0.75 para dar mais liberdade criativa e fugir do traço original
+            temperature: 0.75, 
+        }
+      };
+
+      // Endpoint para edição de imagem/multimodal
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+
+      const data = await fetchWithRetry(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      // Extração da imagem da resposta da API
+      // A estrutura de resposta para imagem pode variar, mas geralmente vem em inlineData dentro do candidate
+      const generatedPart = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+      
+      if (generatedPart) {
+        const generatedBase64 = generatedPart.inlineData.data;
+        setGeneratedImage(`data:image/png;base64,${generatedBase64}`);
+      } else {
+        // Fallback: As vezes o modelo pode recusar ou falhar em gerar a imagem e retornar texto
+        const textPart = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (textPart) {
+             setError("A IA não conseguiu gerar a imagem. Ela disse: " + textPart);
+        } else {
+             setError("A IA processou, mas não retornou uma imagem válida. Tente outra foto.");
+        }
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError("Ocorreu um erro ao transformar a imagem. Tente novamente em alguns instantes.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const downloadImage = () => {
+    if (generatedImage) {
+      const link = document.createElement('a');
+      link.href = generatedImage;
+      link.download = 'colorir-bobbie-goods.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#fff0f5] font-sans text-slate-800 p-4 md:p-8 flex flex-col items-center">
+      {/* Estilo Global para Fontes 'Fofas' simuladas e Scrollbar */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Quicksand:wght@400;600&display=swap');
+        
+        body {
+          font-family: 'Quicksand', sans-serif;
+        }
+        
+        h1, h2, h3, button {
+          font-family: 'Fredoka', sans-serif;
+        }
+
+        .bobbie-border {
+          border: 3px solid #333;
+          box-shadow: 4px 4px 0px #333;
+        }
+        
+        .bobbie-card {
+          background-color: white;
+          border-radius: 24px;
+        }
+      `}</style>
+
+      {/* Cabeçalho */}
+      <header className="mb-8 text-center max-w-2xl">
+        <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full bobbie-border mb-4">
+          <Paintbrush className="w-6 h-6 text-pink-500" />
+          <h1 className="text-2xl md:text-3xl font-bold tracking-wide text-slate-800">
+            Fábrica de Colorir
+          </h1>
+          <Sparkles className="w-6 h-6 text-yellow-400" />
+        </div>
+        <p className="text-slate-600 font-medium text-lg">
+          Transforme suas fotos favoritas em desenhos fofos estilo Bobbie Goods! ✨
+        </p>
+      </header>
+
+      {/* Área Principal */}
+      <main className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        
+        {/* Coluna da Esquerda: Upload e Preview */}
+        <div className="flex flex-col gap-6">
+          <div className="bobbie-card bobbie-border p-6 flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden bg-white">
+            
+            {!selectedImage ? (
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="cursor-pointer flex flex-col items-center justify-center w-full h-full border-4 border-dashed border-pink-200 rounded-xl hover:bg-pink-50 transition-colors p-10"
+              >
+                <div className="bg-pink-100 p-4 rounded-full mb-4">
+                  <Upload className="w-10 h-10 text-pink-500" />
+                </div>
+                <p className="text-lg font-bold text-slate-700">Clique para enviar uma foto</p>
+                <p className="text-sm text-slate-500 mt-2 text-center">
+                  Escolha uma foto clara e com boa iluminação
+                </p>
+              </div>
+            ) : (
+              <div className="relative w-full h-full flex flex-col items-center">
+                <div className="relative w-full aspect-square md:aspect-auto md:h-[350px] rounded-xl overflow-hidden border-2 border-slate-100 mb-4 bg-slate-50">
+                   <img 
+                    src={selectedImage} 
+                    alt="Original" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                
+                <button 
+                  onClick={() => setSelectedImage(null)}
+                  className="flex items-center gap-2 text-slate-500 hover:text-pink-600 transition-colors text-sm font-bold"
+                >
+                  <RefreshCw className="w-4 h-4" /> Escolher outra foto
+                </button>
+              </div>
+            )}
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileSelect} 
+              accept="image/*" 
+              className="hidden" 
+            />
+          </div>
+
+          <button
+            onClick={generateColoringPage}
+            disabled={!selectedImage || isLoading}
+            className={`
+              w-full py-4 rounded-xl text-xl font-bold text-white transition-all transform active:scale-95 bobbie-border border-black
+              ${!selectedImage || isLoading 
+                ? 'bg-slate-300 cursor-not-allowed border-slate-400 shadow-none' 
+                : 'bg-[#ff9ecd] hover:bg-[#ff85c0] shadow-[4px_4px_0px_#000]'}
+            `}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <RefreshCw className="w-6 h-6 animate-spin" /> Desenhando...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                <Sparkles className="w-6 h-6" /> Transformar em Desenho!
+              </span>
+            )}
+          </button>
+          
+          {error && (
+            <div className="bg-red-50 border-2 border-red-200 text-red-600 p-4 rounded-xl text-center font-medium">
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Coluna da Direita: Resultado */}
+        <div className="flex flex-col gap-6">
+           <div className="bobbie-card bobbie-border p-6 flex flex-col items-center justify-center min-h-[400px] bg-white relative">
+             <div className="absolute top-4 left-4 bg-yellow-200 px-3 py-1 rounded-full border-2 border-black text-xs font-bold transform -rotate-3 z-10">
+               RESULTADO
+             </div>
+
+             {!generatedImage ? (
+               <div className="text-center opacity-40">
+                 {isLoading ? (
+                   <div className="flex flex-col items-center animate-pulse">
+                     <div className="w-24 h-24 bg-slate-200 rounded-full mb-4"></div>
+                     <div className="h-4 w-48 bg-slate-200 rounded mb-2"></div>
+                     <div className="h-4 w-32 bg-slate-200 rounded"></div>
+                     <p className="mt-4 font-bold text-slate-400">A mágica está acontecendo...</p>
+                   </div>
+                 ) : (
+                   <div className="flex flex-col items-center">
+                     <ImageIcon className="w-16 h-16 mb-4 text-slate-300" />
+                     <p className="font-bold text-slate-400">O desenho aparecerá aqui</p>
+                   </div>
+                 )}
+               </div>
+             ) : (
+               <div className="w-full h-full flex flex-col items-center animate-in fade-in zoom-in duration-500">
+                 <div className="w-full border-4 border-black rounded-xl overflow-hidden bg-white shadow-sm mb-4">
+                   <img 
+                     src={generatedImage} 
+                     alt="Desenho Bobbie Goods" 
+                     className="w-full h-auto object-contain max-h-[500px]"
+                   />
+                 </div>
+                 <p className="text-sm text-slate-400 mb-2">Prontinho para imprimir e colorir!</p>
+               </div>
+             )}
+           </div>
+
+           {generatedImage && (
+             <button
+               onClick={downloadImage}
+               className="w-full py-4 rounded-xl text-xl font-bold bg-[#a0e7e5] text-slate-800 bobbie-border border-black shadow-[4px_4px_0px_#000] hover:bg-[#8cdad8] transition-all transform active:scale-95 flex items-center justify-center gap-2"
+             >
+               <Download className="w-6 h-6" /> Baixar Desenho
+             </button>
+           )}
+        </div>
+      </main>
+
+      {/* Rodapé decorativo */}
+      <footer className="mt-12 text-center text-slate-400 text-sm">
+        <p>Estilo inspirado em Bobbie Goods &bull; Gerado com IA</p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
